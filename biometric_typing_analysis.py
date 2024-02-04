@@ -41,23 +41,17 @@ class KeystrokeLogger:
                 self.process_and_log_keystrokes()
                 return False  # Stop the listener
 
+    def filter_event_log(self):
+        """Filter out 'enter' and 'esc' events from the event log."""
+        return [event for event in self.event_log if event[0] not in [Key.enter, Key.esc]]
+
     def process_and_log_keystrokes(self):
         """Process the event log and save it to the CSV file, and log filtered events."""
-        # Filter out the first and last 'enter' or 'esc' events
-        filtered_event_log = [event for event in self.event_log if event[0] not in [Key.enter, Key.esc]]
-
-        # Log filtered events
-        logging.debug("Filtered Event Log:")
-        for event in filtered_event_log:
-            key_code, action, timestamp = event
-            readable_key = key_code if isinstance(key_code, str) else key_code.name
-            logging.debug(f"{readable_key}, {action}, {timestamp}")
-
+        filtered_event_log = self.filter_event_log()
         with open(self.csv_file_path, "a", newline='') as file:
             writer = csv.writer(file)
             for event in filtered_event_log:
                 key_code, action, timestamp = event
-                # Convert the Key object to string if necessary
                 readable_key = key_code if isinstance(key_code, str) else key_code.name
                 if action == 'press':
                     self.keystrokes.append({'key_code': readable_key, 'down_time': timestamp})
