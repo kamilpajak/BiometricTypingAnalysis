@@ -1,3 +1,5 @@
+import logging
+
 from csv_handler import CSVHandler
 from event_log_handler import EventLogHandler
 
@@ -42,5 +44,6 @@ class BiometricTypingAnalysis:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     analysis = BiometricTypingAnalysis()
     analysis.main_menu()

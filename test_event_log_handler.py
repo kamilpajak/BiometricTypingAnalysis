@@ -69,3 +69,52 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
 
     filtered_event_log = event_log_handler.filter_event_log()
     assert filtered_event_log == expected_filtered_event_log
+
+
+@pytest.mark.parametrize("filtered_event_log, expected_keystrokes", [
+    # Test case 1: Simple key sequence with press and release
+    ([
+         ('a', 'press', 0),
+         ('a', 'release', 1),
+         ('b', 'press', 2),
+         ('b', 'release', 3)
+     ], [
+         ('a', 0, 1),
+         ('b', 2, 3)
+     ]),
+    # Test case 2: Overlapping key presses
+    ([
+         ('c', 'press', 4),
+         ('d', 'press', 5),
+         ('c', 'release', 6),
+         ('d', 'release', 7)
+     ], [
+         ('c', 4, 6),
+         ('d', 5, 7)
+     ]),
+    # Test case 3: Key pressed longer
+    ([
+         ('a', 'press', 0),
+         ('a', 'press', 1),
+         ('a', 'press', 2),
+         ('a', 'release', 3)
+     ], [
+         ('a', 0, 3)
+     ]),
+    # Test case 4: A special key held down while another key is pressed and released in the middle
+    ([
+         ('Key.shift', 'press', 0),
+         ('U', 'press', 1),
+         ('U', 'release', 2),
+         ('Key.shift', 'release', 3)
+     ], [
+         ('U', 1, 2),
+         ('Key.shift', 0, 3)
+     ]),
+    # Additional test cases can be added here if needed
+])
+def test_get_keystrokes(filtered_event_log, expected_keystrokes):
+    event_log_handler = EventLogHandler()
+    event_log_handler.event_log = filtered_event_log  # Directly set the filtered event log
+    keystrokes = event_log_handler.get_keystrokes()
+    assert keystrokes == expected_keystrokes

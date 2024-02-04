@@ -1,3 +1,4 @@
+import logging
 import time
 
 from pynput.keyboard import Key, Listener
@@ -48,8 +49,18 @@ class EventLogHandler:
         while end_index >= start_index and self.event_log[end_index][0] in [Key.enter, Key.esc]:
             end_index -= 1
 
-        # Return the filtered event log that excludes 'enter' and 'esc' from the start and end
-        return self.event_log[start_index:end_index + 1]
+        # Extract the filtered event log
+        filtered_event_log = self.event_log[start_index:end_index + 1]
+
+        # Detailed logging of the filtered event log
+        logging.info("Filtered Event Log:")
+        for event in filtered_event_log:
+            key, action, timestamp = event
+            if isinstance(key, Key):
+                key = key.name  # Use the name of special keys, like 'shift'
+            logging.info(f"Event: Key: {key}, Action: {action}, Timestamp: {timestamp}")
+
+        return filtered_event_log
 
     def get_keystrokes(self):
         """Pair up press and release times for each key to create keystrokes from filtered events."""
@@ -59,7 +70,9 @@ class EventLogHandler:
 
         for key, action, timestamp in filtered_event_log:
             if action == 'press':
-                press_times[key] = timestamp
+                # Only update press_times if the key is not already pressed
+                if key not in press_times:
+                    press_times[key] = timestamp
             elif action == 'release' and key in press_times:
                 down_time = press_times[key]
                 up_time = timestamp
