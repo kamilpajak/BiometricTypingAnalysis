@@ -42,8 +42,20 @@ class KeystrokeLogger:
                 return False  # Stop the listener
 
     def filter_event_log(self):
-        """Filter out 'enter' and 'esc' events from the event log."""
-        return [event for event in self.event_log if event[0] not in [Key.enter, Key.esc]]
+        """Filter out 'enter' and 'esc' events from the start and end of the event log."""
+        start_index = 0
+        end_index = len(self.event_log) - 1
+
+        # Skip 'enter' and 'esc' events at the start of the event log
+        while start_index <= end_index and self.event_log[start_index][0] in [Key.enter, Key.esc]:
+            start_index += 1
+
+        # Skip 'enter' and 'esc' events at the end of the event log
+        while end_index >= start_index and self.event_log[end_index][0] in [Key.enter, Key.esc]:
+            end_index -= 1
+
+        # Return the filtered event log that excludes 'enter' and 'esc' from the start and end
+        return self.event_log[start_index:end_index + 1]
 
     def process_and_log_keystrokes(self):
         """Process the event log and save it to the CSV file, and log filtered events."""
