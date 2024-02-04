@@ -120,6 +120,25 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
      ], [
          (Key.shift, 0, 2),
          ('U', 1, 3)
+     ]),
+    # Test case 6: Mixed sequence with modifier key and regular keys pressed and released in varying order.
+    ([
+         (Key.shift, 'press', 0),
+         ('A', 'press', 1),
+         ('A', 'release', 2),
+         (Key.shift, 'release', 3),
+         ('l', 'press', 4),
+         ('l', 'release', 5),
+         (Key.shift, 'press', 6),
+         ('A', 'press', 7),
+         (Key.shift, 'release', 8),
+         ('A', 'release', 9),
+     ], [
+         ('A', 1, 2),
+         (Key.shift, 0, 3),
+         ('l', 4, 5),
+         (Key.shift, 6, 8),
+         ('A', 7, 9)
      ])
 ])
 def test_get_keystrokes(filtered_event_log, expected_keystrokes):
