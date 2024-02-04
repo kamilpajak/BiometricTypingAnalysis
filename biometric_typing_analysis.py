@@ -1,138 +1,35 @@
-import csv
-import logging
-import time
-
-import numpy as np
-from pynput.keyboard import Key, Listener
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+from csv_handler import CSVHandler
+from event_log_handler import EventLogHandler
+from feature_calculator import FeatureCalculator
 
 
-class KeystrokeLogger:
+class BiometricTypingAnalysis:
     def __init__(self):
-        self.csv_file_path = "keystroke_data.csv"
-        self.features_file_path = "keystroke_features.csv"
-        self.keystrokes = []
-        self.event_log = []
-        self.initialize_files()
-
-    def initialize_files(self):
-        """Initialize CSV files with headers."""
-        with open(self.csv_file_path, "w", newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Key Code", "Press Time", "Release Time"])
-        with open(self.features_file_path, "w", newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Feature", "Mean", "Standard Deviation"])
-
-    def on_press(self, key):
-        """Log key press events with timestamps."""
-        if key not in [Key.ctrl_l, Key.ctrl_r]:  # Skip Ctrl keys
-            key_code = key if isinstance(key, Key) else key.char
-            self.event_log.append((key_code, 'press', time.time()))
-
-    def on_release(self, key):
-        """Log key release events with timestamps."""
-        if key not in [Key.ctrl_l, Key.ctrl_r]:  # Skip Ctrl keys
-            key_code = key if isinstance(key, Key) else key.char
-            self.event_log.append((key_code, 'release', time.time()))
-            if key == Key.esc:
-                self.process_and_log_keystrokes()
-                return False  # Stop the listener
-
-    def filter_event_log(self):
-        """Filter out 'enter' and 'esc' events from the start and end of the event log."""
-        start_index = 0
-        end_index = len(self.event_log) - 1
-
-        # Skip 'enter' and 'esc' events at the start of the event log
-        while start_index <= end_index and self.event_log[start_index][0] in [Key.enter, Key.esc]:
-            start_index += 1
-
-        # Skip 'enter' and 'esc' events at the end of the event log
-        while end_index >= start_index and self.event_log[end_index][0] in [Key.enter, Key.esc]:
-            end_index -= 1
-
-        # Return the filtered event log that excludes 'enter' and 'esc' from the start and end
-        return self.event_log[start_index:end_index + 1]
+        self.event_log_handler = EventLogHandler()
+        self.csv_handler = CSVHandler("keystroke_data.csv", "keystroke_features.csv")
 
     def process_and_log_keystrokes(self):
-        """Process the event log and save it to the CSV file, and log filtered events."""
-        filtered_event_log = self.filter_event_log()
-        with open(self.csv_file_path, "a", newline='') as file:
-            writer = csv.writer(file)
-            for event in filtered_event_log:
-                key_code, action, timestamp = event
-                readable_key = key_code if isinstance(key_code, str) else key_code.name
-                if action == 'press':
-                    self.keystrokes.append({'key_code': readable_key, 'down_time': timestamp})
-                elif action == 'release':
-                    for keystroke in reversed(self.keystrokes):
-                        if keystroke['key_code'] == readable_key and 'up_time' not in keystroke:
-                            keystroke['up_time'] = timestamp
-                            break
-            for keystroke in self.keystrokes:
-                if 'up_time' in keystroke:
-                    writer.writerow([keystroke['key_code'], keystroke['down_time'], keystroke['up_time']])
+        """Process the event log and save it to the CSV file."""
+        filtered_event_log = self.event_log_handler.filter_event_log()
+        self.csv_handler.log_keystrokes(filtered_event_log)
 
-        # After logging, calculate and log features
-        self.calculate_and_log_features()
-
-    def calculate_and_log_features(self):
-        """Calculate features from the keystrokes and log them."""
-        if not self.keystrokes:
-            return
-
-        # Calculate features
-        features = self.calculate_features()
-
-        # Log features to CSV
-        with open(self.features_file_path, "a", newline='') as file:
-            writer = csv.writer(file)
-            for feature, values in features.items():
-                writer.writerow([feature, values['Mean'], values['Standard Deviation']])
-
-        # Clear keystrokes for next session
-        self.keystrokes.clear()
-
-    def calculate_features(self):
-        """Calculate statistical features from the keystrokes."""
-        dd_times = [self.keystrokes[i]['down_time'] - self.keystrokes[i - 1]['down_time'] for i in
-                    range(1, len(self.keystrokes))]
-        ud_times = [self.keystrokes[i]['down_time'] - self.keystrokes[i - 1]['up_time'] for i in
-                    range(1, len(self.keystrokes))]
-        du_times = [keystroke['up_time'] - keystroke['down_time'] for keystroke in self.keystrokes if
-                    'up_time' in keystroke]
-
-        features = {
-            'DD Time': {'Mean': np.mean(dd_times) if dd_times else 0,
-                        'Standard Deviation': np.std(dd_times, ddof=1) if len(dd_times) > 1 else 0},
-            'UD Time': {'Mean': np.mean(ud_times) if ud_times else 0,
-                        'Standard Deviation': np.std(ud_times, ddof=1) if len(ud_times) > 1 else 0},
-            'DU Time': {'Mean': np.mean(du_times) if du_times else 0,
-                        'Standard Deviation': np.std(du_times, ddof=1) if len(du_times) > 1 else 0},
-        }
-
-        return features
-
-    def start_listener(self):
-        """Start the keystroke listener."""
-        with Listener(on_press=self.on_press, on_release=self.on_release) as listener:
-            listener.join()
+        # Calculate and log features
+        features = FeatureCalculator.calculate_features(filtered_event_log)
+        self.csv_handler.log_features(features)
 
     def enrollment_phase(self):
         """Handle the enrollment phase."""
-        print("Welcome to the Keystroke Dynamics Enrollment")
-        target_string = "Please type the following string and press ESC to complete enrollment: Uniwersytet Slaski"
-        print(target_string)
-        self.event_log.clear()  # Clear any previous events
-        self.start_listener()
+        print("Welcome to the Biometric Typing Analysis Enrollment")
+        target_string = "Uniwersytet Slaski"
+        print(f"Please type the following string and press ESC to complete enrollment: {target_string}")
+        self.event_log_handler.clear_event_log()  # Clear any previous events within the handler
+        self.event_log_handler.start_listener()  # Start and run the listener within the handler
+        self.process_and_log_keystrokes()
 
     def main_menu(self):
         """Display the main menu and handle user choices."""
         while True:
-            print("\nKeystroke Dynamics System")
+            print("\nBiometric Typing Analysis System")
             print("1. Enrollment")
             print("2. Authentication")
             print("3. Exit")
@@ -150,5 +47,5 @@ class KeystrokeLogger:
 
 
 if __name__ == "__main__":
-    keystroke_logger = KeystrokeLogger()
-    keystroke_logger.main_menu()
+    analysis = BiometricTypingAnalysis()
+    analysis.main_menu()

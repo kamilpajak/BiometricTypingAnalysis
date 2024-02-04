@@ -1,7 +1,7 @@
 import pytest
 from pynput.keyboard import Key
 
-from biometric_typing_analysis import KeystrokeLogger
+from event_log_handler import EventLogHandler
 
 
 @pytest.mark.parametrize("event_log,expected_filtered_event_log", [
@@ -64,8 +64,8 @@ from biometric_typing_analysis import KeystrokeLogger
      ])
 ])
 def test_filter_event_log(event_log, expected_filtered_event_log):
-    keystroke_logger = KeystrokeLogger()
-    keystroke_logger.event_log = event_log
+    event_log_handler = EventLogHandler()
+    event_log_handler.event_log = event_log
 
-    filtered_event_log = keystroke_logger.filter_event_log()
+    filtered_event_log = event_log_handler.filter_event_log()
     assert filtered_event_log == expected_filtered_event_log
