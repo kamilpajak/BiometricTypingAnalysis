@@ -20,9 +20,8 @@ class CSVHandler:
         """Log the keystrokes to a CSV file."""
         with open(self.keystroke_data_path, "a", newline='') as file:
             writer = csv.writer(file)
-            for keystroke in keystrokes:
-                if 'up_time' in keystroke:
-                    writer.writerow([keystroke['key_code'], keystroke['down_time'], keystroke['up_time']])
+            for key, down_time, up_time in keystrokes:
+                writer.writerow([key, down_time, up_time])
 
     def log_features(self, features):
         """Log the features to a CSV file."""

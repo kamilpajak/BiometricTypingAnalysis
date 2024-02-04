@@ -1,6 +1,5 @@
 from csv_handler import CSVHandler
 from event_log_handler import EventLogHandler
-from feature_calculator import FeatureCalculator
 
 
 class BiometricTypingAnalysis:
@@ -10,12 +9,8 @@ class BiometricTypingAnalysis:
 
     def process_and_log_keystrokes(self):
         """Process the event log and save it to the CSV file."""
-        filtered_event_log = self.event_log_handler.filter_event_log()
-        self.csv_handler.log_keystrokes(filtered_event_log)
-
-        # Calculate and log features
-        features = FeatureCalculator.calculate_features(filtered_event_log)
-        self.csv_handler.log_features(features)
+        keystrokes = self.event_log_handler.get_keystrokes()
+        self.csv_handler.log_keystrokes(keystrokes)
 
     def enrollment_phase(self):
         """Handle the enrollment phase."""

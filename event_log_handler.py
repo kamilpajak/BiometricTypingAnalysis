@@ -50,3 +50,20 @@ class EventLogHandler:
 
         # Return the filtered event log that excludes 'enter' and 'esc' from the start and end
         return self.event_log[start_index:end_index + 1]
+
+    def get_keystrokes(self):
+        """Pair up press and release times for each key to create keystrokes from filtered events."""
+        filtered_event_log = self.filter_event_log()  # Obtain filtered events
+        press_times = {}
+        keystrokes = []
+
+        for key, action, timestamp in filtered_event_log:
+            if action == 'press':
+                press_times[key] = timestamp
+            elif action == 'release' and key in press_times:
+                down_time = press_times[key]
+                up_time = timestamp
+                keystrokes.append((key, down_time, up_time))
+                del press_times[key]  # Remove the entry after using it
+
+        return keystrokes
