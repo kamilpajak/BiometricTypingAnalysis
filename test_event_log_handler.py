@@ -72,7 +72,7 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
 
 
 @pytest.mark.parametrize("filtered_event_log, expected_keystrokes", [
-    # Test case 1: Simple key sequence with press and release
+    # Test case 1: Simple sequence where each key is pressed and then released.
     ([
          ('a', 'press', 0),
          ('a', 'release', 1),
@@ -82,17 +82,17 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
          ('a', 0, 1),
          ('b', 2, 3)
      ]),
-    # Test case 2: Overlapping key presses
+    # Test case 2: Sequence with overlapping presses, demonstrating concurrent key actions.
     ([
-         ('c', 'press', 4),
-         ('d', 'press', 5),
-         ('c', 'release', 6),
-         ('d', 'release', 7)
+         ('a', 'press', 0),
+         ('b', 'press', 1),
+         ('a', 'release', 2),
+         ('b', 'release', 3)
      ], [
-         ('c', 4, 6),
-         ('d', 5, 7)
+         ('a', 0, 2),
+         ('b', 1, 3)
      ]),
-    # Test case 3: Key pressed longer
+    # Test case 3: A single key pressed multiple times before being released, showcasing the handling of key holding.
     ([
          ('a', 'press', 0),
          ('a', 'press', 1),
@@ -101,17 +101,26 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
      ], [
          ('a', 0, 3)
      ]),
-    # Test case 4: A special key held down while another key is pressed and released in the middle
+    # Test case 4: A modifier key (shift) is held down while another key ('U') is pressed and released.
     ([
-         ('Key.shift', 'press', 0),
+         (Key.shift, 'press', 0),
          ('U', 'press', 1),
          ('U', 'release', 2),
-         ('Key.shift', 'release', 3)
+         (Key.shift, 'release', 3)
      ], [
          ('U', 1, 2),
-         ('Key.shift', 0, 3)
+         (Key.shift, 0, 3)
      ]),
-    # Additional test cases can be added here if needed
+    # Test case 5: Similar to test case 4 but the release order is reversed.
+    ([
+         (Key.shift, 'press', 0),
+         ('U', 'press', 1),
+         (Key.shift, 'release', 2),
+         ('U', 'release', 3)
+     ], [
+         (Key.shift, 0, 2),
+         ('U', 1, 3)
+     ])
 ])
 def test_get_keystrokes(filtered_event_log, expected_keystrokes):
     event_log_handler = EventLogHandler()

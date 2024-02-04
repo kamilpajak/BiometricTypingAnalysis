@@ -2,17 +2,50 @@ import logging
 
 from csv_handler import CSVHandler
 from event_log_handler import EventLogHandler
+from feature_calculator import FeatureCalculator
 
 
 class BiometricTypingAnalysis:
     def __init__(self):
+        # Initialize the event log handler for capturing keyboard events.
         self.event_log_handler = EventLogHandler()
+        # Initialize the CSV handler for logging data to CSV files.
         self.csv_handler = CSVHandler("keystroke_data.csv", "keystroke_features.csv")
+        # Initialize a place to store keystrokes after they are first retrieved.
+        self.keystrokes = []
 
     def process_and_log_keystrokes(self):
-        """Process the event log and save it to the CSV file."""
-        keystrokes = self.event_log_handler.get_keystrokes()
-        self.csv_handler.log_keystrokes(keystrokes)
+        """
+        Retrieve keystrokes from the event log, process them,
+        and log the detailed keystroke information to a CSV file.
+        """
+        # Extract keystrokes (key press and release events) from the event log.
+        self.keystrokes = self.event_log_handler.get_keystrokes()
+        # Log the processed keystrokes to the designated CSV file.
+        self.csv_handler.log_keystrokes(self.keystrokes)
+
+    def process_and_log_features(self):
+        """
+        Calculate features from existing keystrokes and
+        log the calculated features to a CSV file.
+        """
+        if not self.keystrokes:
+            logging.info("No keystrokes to process for features.")
+            return
+
+        # Calculate features based on the already extracted keystrokes.
+        features = FeatureCalculator.calculate_features(self.keystrokes)
+        # Log the calculated features to the designated CSV file.
+        self.csv_handler.log_features(features)
+
+    def run_analysis(self):
+        """
+        A method to encapsulate the full analysis process.
+        """
+        print("Starting keystroke analysis...")
+        self.process_and_log_keystrokes()
+        self.process_and_log_features()
+        print("Analysis complete.")
 
     def enrollment_phase(self):
         """Handle the enrollment phase."""
