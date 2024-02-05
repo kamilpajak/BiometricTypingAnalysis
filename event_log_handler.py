@@ -68,15 +68,23 @@ class EventLogHandler:
         press_times = {}
         keystrokes = []
 
-        for key, action, timestamp in filtered_event_log:
+        for event in filtered_event_log:
+            key, action, timestamp = event
+            # Check if the key is a special key
+            is_special_key = isinstance(key, Key)
+
+            # Use the original key object for special keys, lowercase string for regular keys
+            key_identifier = key if is_special_key else key.lower()
+
             if action == 'press':
-                # Only update press_times if the key is not already pressed
-                if key not in press_times:
-                    press_times[key] = timestamp
-            elif action == 'release' and key in press_times:
-                down_time = press_times[key]
+                if key_identifier not in press_times:
+                    press_times[key_identifier] = timestamp
+            elif action == 'release' and key_identifier in press_times:
+                down_time = press_times[key_identifier]
                 up_time = timestamp
-                keystrokes.append((key, down_time, up_time))
-                del press_times[key]  # Remove the entry after using it
+                # Use the original key for special keys in the output, lowercase for regular keys
+                keystrokes_output = key if is_special_key else key_identifier
+                keystrokes.append((keystrokes_output, down_time, up_time))
+                del press_times[key_identifier]  # Remove the entry after using it
 
         return keystrokes
