@@ -131,14 +131,14 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
          ('l', 'release', 5),
          (Key.shift, 'press', 6),
          ('A', 'press', 7),
-         (Key.shift, 'release', 8),
-         ('a', 'release', 9),
+         ('A', 'release', 8),
+         (Key.shift, 'release', 9),
      ], [
          (Key.shift, 0, 2),
          ('a', 1, 3),
          ('l', 4, 5),
-         (Key.shift, 6, 8),
-         ('a', 7, 9)
+         ('a', 7, 8),
+         (Key.shift, 6, 9)
      ])
 ])
 def test_get_keystrokes(filtered_event_log, expected_keystrokes):
