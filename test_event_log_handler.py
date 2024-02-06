@@ -108,8 +108,8 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
          ('U', 'release', 2),
          (Key.shift, 'release', 3)
      ], [
-         ('u', 1, 2),
-         (Key.shift, 0, 3)
+         (Key.shift, 0, 3),
+         ('u', 1, 2)
      ]),
     # Test case 5: Similar to test case 4 but the release order is reversed.
     ([
@@ -132,13 +132,13 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
          (Key.shift, 'press', 6),
          ('A', 'press', 7),
          ('A', 'release', 8),
-         (Key.shift, 'release', 9),
+         (Key.shift, 'release', 9)
      ], [
          (Key.shift, 0, 2),
          ('a', 1, 3),
          ('l', 4, 5),
-         ('a', 7, 8),
-         (Key.shift, 6, 9)
+         (Key.shift, 6, 9),
+         ('a', 7, 8)
      ])
 ])
 def test_get_keystrokes(filtered_event_log, expected_keystrokes):

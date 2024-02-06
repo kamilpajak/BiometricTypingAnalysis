@@ -55,6 +55,7 @@ class BiometricTypingAnalysis:
         self.event_log_handler.clear_event_log()  # Clear any previous events within the handler
         self.event_log_handler.start_listener()  # Start and run the listener within the handler
         self.process_and_log_keystrokes()
+        self.process_and_log_features()
 
     def main_menu(self):
         """Display the main menu and handle user choices."""

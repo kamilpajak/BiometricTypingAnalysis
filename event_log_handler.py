@@ -87,4 +87,6 @@ class EventLogHandler:
                 keystrokes.append((keystrokes_output, down_time, up_time))
                 del press_times[key_identifier]  # Remove the entry after using it
 
+        # Sort the keystrokes by the down_time to ensure they are in the order they were pressed
+        keystrokes.sort(key=lambda k: k[1])
         return keystrokes

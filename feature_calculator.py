@@ -1,21 +1,42 @@
-import numpy as np
-
-
 class FeatureCalculator:
     @staticmethod
     def calculate_features(keystrokes):
-        """Calculate statistical features from the keystrokes."""
-        dd_times = [keystrokes[i]['down_time'] - keystrokes[i - 1]['down_time'] for i in range(1, len(keystrokes))]
-        ud_times = [keystrokes[i]['down_time'] - keystrokes[i - 1]['up_time'] for i in range(1, len(keystrokes))]
-        du_times = [keystroke['up_time'] - keystroke['down_time'] for keystroke in keystrokes if 'up_time' in keystroke]
+        """
+        Calculate keystroke features: keys, DD, UD, and DU times.
 
-        features = {
-            'DD Time': {'Mean': np.mean(dd_times) if dd_times else 0,
-                        'Standard Deviation': np.std(dd_times, ddof=1) if len(dd_times) > 1 else 0},
-            'UD Time': {'Mean': np.mean(ud_times) if ud_times else 0,
-                        'Standard Deviation': np.std(ud_times, ddof=1) if len(ud_times) > 1 else 0},
-            'DU Time': {'Mean': np.mean(du_times) if du_times else 0,
-                        'Standard Deviation': np.std(du_times, ddof=1) if len(du_times) > 1 else 0},
+        keystrokes: list of tuples, where each tuple contains (key, down_time, up_time)
+
+        Returns a dictionary with the following structure:
+        {
+            'keys': [keys...],
+            'DD': [down-down times...],
+            'UD': [up-down times...],
+            'DU': [down-up times...],
         }
+        """
+        # Initialize features with keys and placeholders for the first DD and UD times
+        features = {
+            'keys': [k[0] for k in keystrokes],
+            'DD': [None],  # First DD time is None because there's no preceding keystroke
+            'UD': [None],  # First UD time is None because there's no preceding keystroke
+            'DU': [],  # DU times will be calculated for each keystroke
+        }
+
+        # Calculate the DU time for each keystroke
+        for _, down_time, up_time in keystrokes:
+            features['DU'].append(up_time - down_time)
+
+        # Calculate DD and UD times for the rest of the keystrokes
+        for i in range(1, len(keystrokes)):
+            _, prev_down_time, prev_up_time = keystrokes[i - 1]
+            _, down_time, _ = keystrokes[i]
+
+            # Down-Down Time (DD)
+            dd_time = down_time - prev_down_time
+            features['DD'].append(dd_time)
+
+            # Up-Down Time (UD)
+            ud_time = down_time - prev_up_time
+            features['UD'].append(ud_time)
 
         return features
