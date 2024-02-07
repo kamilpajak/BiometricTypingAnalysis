@@ -1,5 +1,4 @@
 import logging
-import threading
 
 from tabulate import tabulate
 
@@ -11,7 +10,6 @@ class BiometricTypingAnalysis:
     def __init__(self):
         self.keystrokes = None
         self.keyboard_event_handler = KeyboardEventHandler()
-        self.logging_completed = threading.Event()
 
     def retrieve_keystrokes(self):
         self.keystrokes = self.keyboard_event_handler.get_keystrokes()
@@ -19,7 +17,6 @@ class BiometricTypingAnalysis:
         table = tabulate(table_data, headers=["Key Code", "Press Time", "Release Time"], tablefmt="grid",
                          floatfmt=".3f")
         logging.info(f"\n{table}")
-        self.logging_completed.set()
 
     def calculate_features(self):
         if not self.keystrokes:
@@ -28,7 +25,6 @@ class BiometricTypingAnalysis:
         features = FeatureCalculator.calculate_features(self.keystrokes)
         logging.info("Features:")
         logging.info(features)
-        self.logging_completed.set()
 
     def enrollment_phase(self):
         print("Welcome to the Biometric Typing Analysis Enrollment")
@@ -37,14 +33,8 @@ class BiometricTypingAnalysis:
         self.keyboard_event_handler.clear_keyboard_events()
         self.keyboard_event_handler.start_listener()
 
-        self.keyboard_event_handler.listener_stopped.wait()
-
         self.retrieve_keystrokes()
         self.calculate_features()
-
-        self.logging_completed.wait()
-
-        self.keyboard_event_handler.listener_stopped.clear()
 
     def main_menu(self):
         print("\nBiometric Typing Analysis System")
