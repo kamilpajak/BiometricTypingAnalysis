@@ -1,10 +1,10 @@
 import pytest
 from pynput.keyboard import Key
 
-from event_log_handler import EventLogHandler
+from keyboard_event_handler import KeyboardEventHandler
 
 
-@pytest.mark.parametrize("event_log,expected_filtered_event_log", [
+@pytest.mark.parametrize("keyboard_events,expected_filtered_keyboard_events", [
     ([
          # Filtering out 'enter' and 'esc' events at the beginning and end
          (Key.enter, 'release', 0),
@@ -63,15 +63,15 @@ from event_log_handler import EventLogHandler
          ('t', 'release', 13),
      ])
 ])
-def test_filter_event_log(event_log, expected_filtered_event_log):
-    event_log_handler = EventLogHandler()
-    event_log_handler.event_log = event_log
+def test_filter_keyboard_events(keyboard_events, expected_filtered_keyboard_events):
+    event_log_handler = KeyboardEventHandler()
+    event_log_handler.keyboard_events = keyboard_events
 
-    filtered_event_log = event_log_handler.filter_event_log()
-    assert filtered_event_log == expected_filtered_event_log
+    filtered_keyboard_events = event_log_handler.filter_keyboard_events()
+    assert filtered_keyboard_events == expected_filtered_keyboard_events
 
 
-@pytest.mark.parametrize("filtered_event_log, expected_keystrokes", [
+@pytest.mark.parametrize("filtered_keyboard_events, expected_keystrokes", [
     # Test case 1: Simple sequence where each key is pressed and then released.
     ([
          ('a', 'press', 0),
@@ -141,8 +141,9 @@ def test_filter_event_log(event_log, expected_filtered_event_log):
          ('a', 7, 8)
      ])
 ])
-def test_get_keystrokes(filtered_event_log, expected_keystrokes):
-    event_log_handler = EventLogHandler()
-    event_log_handler.event_log = filtered_event_log  # Directly set the filtered event log
+def test_get_keystrokes(filtered_keyboard_events, expected_keystrokes):
+    event_log_handler = KeyboardEventHandler()
+    event_log_handler.keyboard_events = filtered_keyboard_events
+
     keystrokes = event_log_handler.get_keystrokes()
     assert keystrokes == expected_keystrokes
