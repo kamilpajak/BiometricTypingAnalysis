@@ -17,8 +17,8 @@ class FeatureCalculator:
         # Initialize features with keys and placeholders for the first DD and UD times
         features = {
             'keys': [k[0] for k in keystrokes],
-            'DD': [None],  # First DD time is None because there's no preceding keystroke
-            'UD': [None],  # First UD time is None because there's no preceding keystroke
+            'DD': [],  # DD times will be calculated for each keystroke
+            'UD': [],  # UD times will be calculated for each keystroke
             'DU': [],  # DU times will be calculated for each keystroke
         }
 

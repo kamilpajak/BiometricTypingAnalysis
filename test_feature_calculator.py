@@ -11,8 +11,8 @@ from feature_calculator import FeatureCalculator
          ('b', 2, 3)
      ], {
          'keys': ['a', 'b'],
-         'DD': [None, 2],
-         'UD': [None, 1],
+         'DD': [2],
+         'UD': [1],
          'DU': [1, 1]
      }),
 
@@ -23,8 +23,8 @@ from feature_calculator import FeatureCalculator
          ('c', 5, 6)
      ], {
          'keys': ['a', 'b', 'c'],
-         'DD': [None, 1, 4],
-         'UD': [None, -2, 1],
+         'DD': [1, 4],
+         'UD': [-2, 1],
          'DU': [3, 3, 1]
      }),
 

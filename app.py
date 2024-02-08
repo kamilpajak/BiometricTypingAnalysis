@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 
+from feature_calculator import FeatureCalculator
 from keystroke_processor import KeystrokeProcessor
 
 app = Flask(__name__)
-
-keystroke_processor = KeystrokeProcessor()
 
 
 @app.route('/')
@@ -12,12 +11,14 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/capture_keystrokes', methods=['POST'])
-def capture_keystrokes():
+@app.route('/analyze_keystrokes', methods=['POST'])
+def analyze_keystrokes():
     key_events = request.json
     processor = KeystrokeProcessor()
     keystrokes = processor.process_key_events(key_events)
-    return jsonify({'message': 'Keystrokes processed successfully', 'data': keystrokes})
+    feature_calculator = FeatureCalculator()
+    features = feature_calculator.calculate_features(keystrokes)
+    return jsonify({'message': 'Keystrokes analyzed successfully', 'data': features})
 
 
 @app.before_request

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function sendKeystrokesToServer() {
   const data = JSON.stringify(keystrokes);
 
-  fetch('/capture_keystrokes', {
+  fetch('/analyze_keystrokes', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
