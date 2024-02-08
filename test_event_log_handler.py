@@ -138,6 +138,5 @@ def test_filter_keyboard_events(keyboard_events, expected_filtered_keyboard_even
 ])
 def test_get_keystrokes(key_events, expected_keystrokes):
     keystroke_processor = KeystrokeProcessor()
-    keystroke_processor.process_key_events(key_events)
-    processed_keystrokes = keystroke_processor.get_keystrokes()
+    processed_keystrokes = keystroke_processor.process_key_events(key_events)
     assert processed_keystrokes == expected_keystrokes

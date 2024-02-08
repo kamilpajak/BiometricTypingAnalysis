@@ -16,8 +16,7 @@ def index():
 def capture_keystrokes():
     key_events = request.json
     processor = KeystrokeProcessor()
-    processor.process_key_events(key_events)
-    keystrokes = processor.get_keystrokes()
+    keystrokes = processor.process_key_events(key_events)
     return jsonify({'message': 'Keystrokes processed successfully', 'data': keystrokes})
 
 
