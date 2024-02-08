@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Biometric Typing Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<h1>Biometric Typing Analysis System</h1>
+<form action="/capture_keystrokes" method="post">
+    <label for="typingData">Please type the text below and press submit:</label>
+    <p id="targetString">Uniwersytet Slaski</p>
+    <textarea id="typingData" name="typingData"></textarea>
+    <input type="button" value="Send Data" onclick="sendKeystrokesToServer()">
+</form>
+<script src="{{ url_for('static', filename='js/static.js') }}"></script>
+</body>
+</html>

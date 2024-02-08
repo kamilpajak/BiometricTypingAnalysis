@@ -3,7 +3,7 @@ import logging
 from tabulate import tabulate
 
 from feature_calculator import FeatureCalculator
-from keyboard_event_handler import KeyboardEventHandler
+from keystroke_processor import KeyboardEventHandler
 
 
 class BiometricTypingAnalysis:
