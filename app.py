@@ -108,6 +108,12 @@ def before_request():
 
 @app.after_request
 def after_request(response):
+    # Add headers to both force the latest IE rendering engine or Chrome Frame,
+    # and also to cache the rendered page for 10 minutes.
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
+    response.headers["Expires"] = 0
+    response.headers["Pragma"] = "no-cache"
+
     app.logger.debug('Response status: %s', response.status)
     if not response.direct_passthrough:
         app.logger.debug('Response data:\n%s', response.get_data(as_text=True))
