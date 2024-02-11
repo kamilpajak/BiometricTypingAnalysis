@@ -1,11 +1,11 @@
-let keystrokes = [];
+let key_events = [];
 
 document.addEventListener('DOMContentLoaded', (event) => {
   const typingDataTextarea = document.getElementById('typingData');
 
   typingDataTextarea.addEventListener('keydown', (event) => {
     const keydownTime = Date.now();
-    keystrokes.push({
+    key_events.push({
       key: event.key,
       type: 'press',
       time: keydownTime
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   typingDataTextarea.addEventListener('keyup', (event) => {
     const keyupTime = Date.now();
-    keystrokes.push({
+    key_events.push({
       key: event.key,
       type: 'release',
       time: keyupTime
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 function sendKeystrokesToServer() {
-  const data = JSON.stringify(keystrokes);
+  const data = JSON.stringify({ key_events: key_events });
 
   fetch('/analyze_keystrokes', {
     method: 'POST',
@@ -35,6 +35,7 @@ function sendKeystrokesToServer() {
   .then(response => response.json())
   .then(data => {
     console.log('Success:', data);
+    key_events = [];
   })
   .catch((error) => {
     console.error('Error:', error);

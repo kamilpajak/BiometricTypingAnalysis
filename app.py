@@ -91,12 +91,17 @@ def logout():
 
 @app.route('/analyze_keystrokes', methods=['POST'])
 def analyze_keystrokes():
-    key_events = request.json
+    data = request.json
+    key_events = data.get('key_events')
     processor = KeystrokeProcessor()
-    keystrokes = processor.process_key_events(key_events)
     feature_calculator = FeatureCalculator()
-    features = feature_calculator.calculate_features(keystrokes)
-    return jsonify({'message': 'Keystrokes analyzed successfully', 'data': features})
+
+    if key_events is not None:
+        processed_data = processor.process_key_events(key_events)
+        features = feature_calculator.calculate_features(processed_data)
+        return jsonify({'message': 'Keystrokes analyzed successfully', 'data': features})
+    else:
+        return jsonify({'error': 'No key_events data found'}), 400
 
 
 @app.before_request

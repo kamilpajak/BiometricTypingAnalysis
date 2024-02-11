@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4 text-center">Biometric Typing Analysis System</h1>
-    <form action="/analyze_keystrokes" method="post" class="needs-validation" novalidate>
+    <form id="typingForm" action="/analyze_keystrokes" method="post" class="needs-validation" novalidate>
         <div class="mb-3">
             <label for="typingData" class="form-label">Please type the text below and press submit:</label>
             <p id="targetString" class="fs-5">Lorem ipsum</p>
@@ -11,8 +11,7 @@
             <div class="invalid-feedback">Please type the required text.</div>
         </div>
         <div class="text-center">
-            <!-- Temporary fix for submit button to avoid double-rendering issue caused by Flask-WTF -->
-            <input type="submit" class="btn btn-primary" value="Send Data">
+            <button type="button" class="btn btn-primary" onclick="sendKeystrokesToServer()">Send Data</button>
         </div>
     </form>
 </div>
