@@ -1,3 +1,5 @@
+import random
+
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, g, session
 from sqlalchemy.exc import IntegrityError
 
@@ -7,67 +9,76 @@ from forms import RegistrationForm, LoginForm
 from keystroke_processor import KeystrokeProcessor
 from models.models import User
 
+# Initialize Flask app
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Or another database URI
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Database URI
+app.config['SECRET_KEY'] = 'your_secret_key'  # Secret key for session management
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable track modifications
+
+# Initialize database with app
 db.init_app(app)
 
+# Predefined phrases for typing test
+phrases = ["Quick brown", "Lazy dog", "Jumped over"]
 
+
+# Create database tables before first request if not already created
 @app.before_request
 def create_tables():
     if not hasattr(g, 'db_created'):
         db.create_all()
-        # Remove the handler so it only runs once
-        app.before_request_funcs[None].remove(create_tables)
+        app.before_request_funcs[None].remove(create_tables)  # Remove handler to run only once
 
 
+# Main page route
 @app.route('/')
 def index():
     if 'user_id' in session:
-        return render_template('index.html')
+        return render_template('index.html')  # Show main page if logged in
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('login'))  # Redirect to login if not logged in
 
 
+# Route to get a new random phrase as JSON
+@app.route('/get_new_phrase')
+def get_new_phrase():
+    random_phrase = random.choice(phrases)  # Select a random phrase
+    return jsonify({'newPhrase': random_phrase})
+
+
+# User registration route
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        # Check whether user already exists
-        user_by_email = User.query.filter_by(email=form.email.data).first()
-        if user_by_email:
+        # Check for existing user
+        if User.query.filter_by(email=form.email.data).first():
             flash('Email already registered. Please log in.', 'danger')
             return redirect(url_for('login'))
 
-        user_by_username = User.query.filter_by(username=form.username.data).first()
-        if user_by_username:
+        if User.query.filter_by(username=form.username.data).first():
             flash('Username already taken. Please choose a different one.', 'danger')
             return redirect(url_for('register'))
 
-        # Create a new user with the form data
+        # Create and add new user to database
         new_user = User(username=form.username.data, email=form.email.data)
         new_user.set_password(form.password.data)
-
-        # Add the new user to the database
         db.session.add(new_user)
         try:
             db.session.commit()
             flash('Account created successfully! You can now log in.', 'success')
             return redirect(url_for('login'))
-        except IntegrityError:  # Catching a specific SQLAlchemy IntegrityError
+        except IntegrityError:
             db.session.rollback()
             flash('There was an issue creating the account. Please try again.', 'danger')
-            return redirect(url_for('register'))
-        except Exception as e:  # Catching any other exceptions that might occur
-            db.session.rollback()
-            flash(f'An error occurred: {e}', 'danger')
             return redirect(url_for('register'))
 
     return render_template('register.html', title='Register', form=form)
 
 
+# User login route
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -82,50 +93,42 @@ def login():
     return render_template('login.html', title='Login', form=form)
 
 
+# User logout route
 @app.route("/logout")
 def logout():
-    session.clear()  # This clears all data stored in the session
+    session.clear()  # Clear session data
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
 
 
+# Route to analyze keystrokes
 @app.route('/analyze_keystrokes', methods=['POST'])
 def analyze_keystrokes():
     data = request.json
     key_events = data.get('key_events')
-    processor = KeystrokeProcessor()
-    feature_calculator = FeatureCalculator()
-
     if key_events is not None:
-        processed_data = processor.process_key_events(key_events)
-        features = feature_calculator.calculate_features(processed_data)
+        processed_data = KeystrokeProcessor().process_key_events(key_events)
+        features = FeatureCalculator().calculate_features(processed_data)
         return jsonify({'message': 'Keystrokes analyzed successfully', 'data': features})
     else:
         return jsonify({'error': 'No key_events data found'}), 400
 
 
+# Log incoming requests
 @app.before_request
 def before_request():
-    app.logger.debug('Incoming request: %s %s', request.method, request.url)
-    if request.method == 'POST':
-        app.logger.debug('Request data: %s', request.get_data(as_text=True))
+    app.logger.debug(f'Incoming request: {request.method} {request.url}')
 
 
+# Log and modify response headers
 @app.after_request
 def after_request(response):
-    # Add headers to both force the latest IE rendering engine or Chrome Frame,
-    # and also to cache the rendered page for 10 minutes.
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
-
-    app.logger.debug('Response status: %s', response.status)
-    if not response.direct_passthrough:
-        app.logger.debug('Response data:\n%s', response.get_data(as_text=True))
-    else:
-        app.logger.debug('Response data: not available (passthrough mode)')
+    app.logger.debug(f'Response status: {response.status}')
     return response
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  # Run the app in debug mode

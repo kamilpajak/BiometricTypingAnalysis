@@ -2,16 +2,22 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">Biometric Typing Analysis System</h1>
-    <form id="typingForm" action="/analyze_keystrokes" method="post" class="needs-validation" novalidate>
-        <div class="mb-3">
-            <label for="typingData" class="form-label">Please type the text below and press submit:</label>
-            <p id="targetString" class="fs-5">Lorem ipsum</p>
-            <textarea id="typingData" name="typingData" class="form-control" rows="4" required></textarea>
-            <div class="invalid-feedback">Please type the required text.</div>
+    <form id="typingForm" action="/" method="post" class="needs-validation" novalidate>
+        <div id="phraseCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner text-center">
+                <div class="carousel-item active">
+                    <div class="d-block w-100">
+                        <h2 class="display-6">Please type the following phrase:</h2>
+                        <p class="lead" id="phraseToType">{{ typing_phrase }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="text-center">
-            <button type="button" class="btn btn-primary" onclick="sendKeystrokesToServer()">Send Data</button>
+
+        <div class="mb-3">
+            <input type="text" id="typingData" name="typingData" class="form-control" required
+                   placeholder="Type here and press Enter">
+            <div class="invalid-feedback">Please type the required text.</div>
         </div>
     </form>
 </div>
