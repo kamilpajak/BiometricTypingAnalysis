@@ -15,40 +15,47 @@
 <!-- base.html -->
 <nav class="navbar navbar-expand-md navbar-light bg-primary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <a class="navbar-brand" href="{{ url_for('capture') }}">
             <img src="{{ url_for('static', filename='favicon.svg') }}" width="30" height="30"
-                 class="d-inline-block align-top" alt="">
+                 class="d-inline-block align-top" alt="Logo">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-                {% if 'user_id' in session %}
+            {% if 'user_id' in session %}
+            <!-- Capture/Home button for logged-in users -->
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('capture') }}">Capture</a>
                 </li>
+            </ul>
+            <!-- Logout button for logged-in users -->
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                 </li>
-                {% else %}
-                <!-- Sign in button -->
+            </ul>
+            {% else %}
+            <!-- Sign in and Sign up buttons for guests -->
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                 <li class="nav-item">
                     <a class="btn btn-outline-light me-2" href="{{ url_for('login') }}">Sign in</a>
                 </li>
-                <!-- Sign up button -->
                 <li class="nav-item">
                     <a class="btn btn-light" href="{{ url_for('register') }}">Sign up</a>
                 </li>
-                {% endif %}
             </ul>
+            {% endif %}
         </div>
     </div>
 </nav>
 
-<main role="main" class="container mt-3"> <!-- Added margin top -->
+<main role="main" class="container mt-3">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}

@@ -35,8 +35,14 @@ def create_tables():
 # Main page route
 @app.route('/')
 def index():
+    return redirect(url_for('capture'))
+
+
+# Capture page route
+@app.route('/capture')
+def capture():
     if 'user_id' in session:
-        return render_template('index.html')  # Show main page if logged in
+        return render_template('capture.html')  # Show capture page if logged in
     else:
         return redirect(url_for('login'))  # Redirect to login if not logged in
 
