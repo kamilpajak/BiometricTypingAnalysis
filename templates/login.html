@@ -3,47 +3,46 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-6 text-center">
+            <!-- SVG Icon and Title above the card -->
+            <img src="{{ url_for('static', filename='favicon.svg') }}" alt="Biometric Typing Analysis Logo"
+                 style="width: 80px; height: 80px; margin-bottom: 1rem;">
+            <h3 class="mb-4 text-white">Sign in to Biometric Typing Analysis</h3>
+
             <div class="card shadow-lg p-4">
                 <div class="card-body">
-                    <h2 class="text-center mb-4">Sign in to Biometric Typing Analysis</h2>
+                    <!-- Start of the form with floating labels -->
                     <form method="post" class="needs-validation" novalidate>
                         {{ form.hidden_tag() }}
-                        <div class="mb-3">
-                            {{ form.email.label(class="form-label") }}
-                            {% if form.email.errors %}
-                            {{ form.email(class="form-control is-invalid", aria_describedby="emailFeedback") }}
-                            <div id="emailFeedback" class="invalid-feedback">
-                                {% for error in form.email.errors %}
-                                {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            {{ form.email(class="form-control", placeholder="Username or email address") }}
-                            {% endif %}
+                        <!-- Email field with floating label and error message -->
+                        <div class="form-floating mb-3">
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                            id="floatingInput", placeholder="Username or email address") }}
+                            {{ form.email.label(class="form-label", for="floatingInput") }}
+                            {% for error in form.email.errors %}
+                            <div class="invalid-feedback text-start">{{ error }}</div>
+                            {% endfor %}
                         </div>
-                        <div class="mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {% if form.password.errors %}
-                            {{ form.password(class="form-control is-invalid", aria_describedby="passwordFeedback") }}
-                            <div id="passwordFeedback" class="invalid-feedback">
-                                {% for error in form.password.errors %}
-                                {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            {{ form.password(class="form-control", placeholder="Password") }}
-                            {% endif %}
+                        <!-- Password field with floating label and error message -->
+                        <div class="form-floating mb-3">
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                            id="floatingPassword", placeholder="Password") }}
+                            {{ form.password.label(class="form-label", for="floatingPassword") }}
+                            {% for error in form.password.errors %}
+                            <div class="invalid-feedback text-start">{{ error }}</div>
+                            {% endfor %}
                         </div>
-                        <div class="d-grid">
+                        <!-- Submit button -->
+                        <div class="d-grid mb-3">
                             <input type="submit" class="btn btn-success btn-lg" value="Sign in">
                         </div>
                     </form>
+                    <!-- Links for forgot password and creating a new account -->
                     <div class="text-center mt-3">
                         <a href="#" class="text-secondary">Forgot password?</a>
                         <hr>
                         <p>New to Biometric Typing Analysis? <a href="{{ url_for('register') }}" class="link-primary">Create
-                            an account</a>.</p>
+                            an account</a></p>
                     </div>
                 </div>
             </div>
