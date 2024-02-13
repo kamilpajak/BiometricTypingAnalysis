@@ -26,7 +26,7 @@ function resetTyping() {
 // Sends the keystrokes to the server if the text matches the phrase
 function sendKeystrokesToServer() {
   if (textMatchesPhrase()) {
-    const data = JSON.stringify({ key_events: keyEvents });
+    const data = JSON.stringify({ keyEvents: keyEvents });
 
     fetch('/capture/analyze_keystrokes', {
       method: 'POST',
@@ -60,13 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
       sendKeystrokesToServer();
     } else {
-      recordKeyEvent(event.key, 'keydown', Date.now());
+      recordKeyEvent(event.key, 'press', Date.now());
     }
   });
 
   typingDataInput.addEventListener('keyup', (event) => {
     if (event.key !== 'Enter') {
-      recordKeyEvent(event.key, 'keyup', Date.now());
+      recordKeyEvent(event.key, 'release', Date.now());
     }
   });
 });

@@ -37,7 +37,7 @@ def get_new_phrase():
 @capture_bp.route("/analyze_keystrokes", methods=["POST"])
 def analyze_keystrokes():
     data = request.json
-    key_events = data.get("key_events")
+    key_events = data.get("keyEvents")
     if key_events is not None:
         processed_data = KeystrokeProcessor().process_key_events(key_events)
         features = FeatureCalculator().calculate_features(processed_data)
