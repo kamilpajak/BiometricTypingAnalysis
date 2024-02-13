@@ -42,7 +42,8 @@ def index():
 @app.route('/capture')
 def capture():
     if 'user_id' in session:
-        return render_template('capture.html')  # Show capture page if logged in
+        phrase_to_type = random.choice(phrases)  # Select a random phrase
+        return render_template('capture.html', phrase_to_type=phrase_to_type)  # Show capture page if logged in
     else:
         return redirect(url_for('login'))  # Redirect to login if not logged in
 
