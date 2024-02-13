@@ -28,12 +28,6 @@ def index():
     return redirect(url_for("auth.login"))
 
 
-@capture_bp.route("/get_new_phrase")
-def get_new_phrase():
-    random_phrase = random.choice(phrases)
-    return jsonify({"newPhrase": random_phrase})
-
-
 @capture_bp.route("/analyze_keystrokes", methods=["POST"])
 def analyze_keystrokes():
     data = request.json

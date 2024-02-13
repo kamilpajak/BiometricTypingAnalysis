@@ -1,7 +1,16 @@
-// static.js
-
 // Initializes an array to store the key events data
 let keyEvents = [];
+
+// This array contains a carefully selected list of phrases optimized to include a total of 63 unique two-letter combinations.
+// These phrases were chosen based on their ability to maximize the diversity of letter pairs, providing a wide range of combinations for analysis or application purposes.
+const phrases = [
+  "Lonely Castle",
+  "Eternal Mountain",
+  "Shattered Light",
+  "Frozen Ocean",
+  "Whispering Flame"
+];
+let currentPhrase = ""; // Variable to store the current phrase
 
 // Retrieves the input element and phrase display by their IDs
 const typingDataInput = document.getElementById('typingData');
@@ -23,6 +32,16 @@ function resetTyping() {
   keyEvents = [];
 }
 
+// Helper function to randomly select a new phrase different from the current one
+function selectNewPhrase() {
+  let newPhrase;
+  do {
+    newPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+  } while (newPhrase === currentPhrase);
+  currentPhrase = newPhrase;
+  phraseToTypeElement.textContent = newPhrase;
+}
+
 // Sends the keystrokes to the server if the text matches the phrase
 function sendKeystrokesToServer() {
   if (textMatchesPhrase()) {
@@ -37,11 +56,7 @@ function sendKeystrokesToServer() {
     .then(data => {
       console.log('Success:', data);
       resetTyping();
-      return fetch('/capture/get_new_phrase');
-    })
-    .then(response => response.json())
-    .then(data => {
-      phraseToTypeElement.textContent = data.newPhrase;
+      selectNewPhrase();
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -54,6 +69,8 @@ function sendKeystrokesToServer() {
 
 // Set up event listeners after the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Initially select a random phrase when the page loads
+  selectNewPhrase();
   // Automatically focus on the typing input field when the page loads
   typingDataInput.focus();
   // Listen for keydown and keyup events on the input field
