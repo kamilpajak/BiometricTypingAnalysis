@@ -54,6 +54,8 @@ function sendKeystrokesToServer() {
 
 // Set up event listeners after the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Automatically focus on the typing input field when the page loads
+  typingDataInput.focus();
   // Listen for keydown and keyup events on the input field
   typingDataInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
