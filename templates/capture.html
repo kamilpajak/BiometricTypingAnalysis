@@ -5,16 +5,17 @@
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
             <!-- SVG Icon and Title above the card -->
-            <img src="{{ url_for('static', filename='favicon.svg') }}" alt="Biometric Typing Analysis Logo"
+            <img alt="Biometric Typing Analysis Logo" src="{{ url_for('static', filename='favicon.svg') }}"
                  style="width: 80px; height: 80px; margin-bottom: 1rem;">
             <h3 class="mb-4 text-white">Please type the following phrase:</h3>
 
             <div class="card shadow-lg p-4">
                 <div class="card-body">
-                    <h3 id="phraseToType" class="display-4 mb-4">{{ phrase_to_type }}</h3>
+                    <h3 class="display-4 mb-4" id="phraseToType">{{ phrase_to_type }}</h3>
                     <!-- Text input for typing -->
-                    <input type="text" id="typingData" class="form-control form-control-lg" required
-                           placeholder="Type here and press Enter">
+                    <input class="form-control form-control-lg" id="typingData" placeholder="Type here and press Enter"
+                           required
+                           type="text">
                     <div class="invalid-feedback">Please type the required text.</div>
                 </div>
             </div>

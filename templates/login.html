@@ -5,14 +5,14 @@
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
             <!-- SVG Icon and Title above the card -->
-            <img src="{{ url_for('static', filename='favicon.svg') }}" alt="Biometric Typing Analysis Logo"
+            <img alt="Biometric Typing Analysis Logo" src="{{ url_for('static', filename='favicon.svg') }}"
                  style="width: 80px; height: 80px; margin-bottom: 1rem;">
             <h3 class="mb-4 text-white">Sign in to Biometric Typing Analysis</h3>
 
             <div class="card shadow-lg p-4">
                 <div class="card-body">
                     <!-- Start of the form with floating labels -->
-                    <form method="post" class="needs-validation" novalidate>
+                    <form class="needs-validation" method="post" novalidate>
                         {{ form.hidden_tag() }}
                         <!-- Email field with floating label and error message -->
                         <div class="form-floating mb-3">
@@ -34,14 +34,15 @@
                         </div>
                         <!-- Submit button -->
                         <div class="d-grid mb-3">
-                            <input type="submit" class="btn btn-success btn-lg" value="Sign in">
+                            <input class="btn btn-success btn-lg" type="submit" value="Sign in">
                         </div>
                     </form>
                     <!-- Links for forgot password and creating a new account -->
                     <div class="text-center mt-3">
-                        <a href="#" class="text-secondary">Forgot password?</a>
+                        <a class="text-secondary" href="#">Forgot password?</a>
                         <hr>
-                        <p>New to Biometric Typing Analysis? <a href="{{ url_for('register') }}" class="link-primary">Create
+                        <p>New to Biometric Typing Analysis? <a class="link-primary"
+                                                                href="{{ url_for('auth.register') }}">Create
                             an account</a></p>
                     </div>
                 </div>
