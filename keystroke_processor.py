@@ -1,3 +1,4 @@
+# keystroke_processor.py
 class KeystrokeProcessor:
     def __init__(self):
         self.keystrokes = []

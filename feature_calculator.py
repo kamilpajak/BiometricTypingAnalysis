@@ -1,3 +1,4 @@
+# feature_calculator.py
 class FeatureCalculator:
     @staticmethod
     def calculate_features(keystrokes):

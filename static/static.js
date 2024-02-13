@@ -1,74 +1,72 @@
-// Initializes an array to store the key events data.
-let key_events = [];
+// static.js
 
-// Listens for the DOMContentLoaded event to ensure the DOM is fully loaded before executing the script.
-document.addEventListener('DOMContentLoaded', (event) => {
-  // Retrieves the input element by its ID.
-  const typingDataInput = document.getElementById('typingData');
+// Initializes an array to store the key events data
+let keyEvents = [];
 
-  // Listens for keydown events on the input field.
+// Retrieves the input element and phrase display by their IDs
+const typingDataInput = document.getElementById('typingData');
+const phraseToTypeElement = document.getElementById('phraseToType');
+
+// Helper function to record a key event
+function recordKeyEvent(key, eventType, time) {
+  keyEvents.push({ key, type: eventType, time });
+}
+
+// Helper function to check if entered text matches the phrase
+function textMatchesPhrase() {
+  return typingDataInput.value.trim() === phraseToTypeElement.textContent.trim();
+}
+
+// Helper function to clear input and key events data
+function resetTyping() {
+  typingDataInput.value = '';
+  keyEvents = [];
+}
+
+// Sends the keystrokes to the server if the text matches the phrase
+function sendKeystrokesToServer() {
+  if (textMatchesPhrase()) {
+    const data = JSON.stringify({ key_events: keyEvents });
+
+    fetch('/capture/analyze_keystrokes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: data
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      resetTyping();
+      return fetch('/capture/get_new_phrase');
+    })
+    .then(response => response.json())
+    .then(data => {
+      phraseToTypeElement.textContent = data.newPhrase;
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  } else {
+    alert('The text does not match. Please try again.');
+    resetTyping();
+  }
+}
+
+// Set up event listeners after the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Listen for keydown and keyup events on the input field
   typingDataInput.addEventListener('keydown', (event) => {
-    // Checks if the Enter key is pressed.
     if (event.key === 'Enter') {
-      event.preventDefault(); // Prevents the default form submission.
-      sendKeystrokesToServer(); // Calls the function to send the key events to the server.
+      event.preventDefault();
+      sendKeystrokesToServer();
     } else {
-      // Records the time of the keydown event.
-      const keydownTime = Date.now();
-      // Adds the keydown event data to the key_events array.
-      key_events.push({
-        key: event.key,
-        type: 'press',
-        time: keydownTime
-      });
+      recordKeyEvent(event.key, 'keydown', Date.now());
     }
   });
 
-  // Listens for keyup events on the input field.
   typingDataInput.addEventListener('keyup', (event) => {
-    // Ignores the keyup event for Enter if it's already handled in keydown.
-    if (event.key === 'Enter') {
-      return;
-    } else {
-      // Records the time of the keyup event.
-      const keyupTime = Date.now();
-      // Adds the keyup event data to the key_events array.
-      key_events.push({
-        key: event.key,
-        type: 'release',
-        time: keyupTime
-      });
+    if (event.key !== 'Enter') {
+      recordKeyEvent(event.key, 'keyup', Date.now());
     }
   });
 });
-
-// Defines the function to send the keystrokes to the server.
-function sendKeystrokesToServer() {
-    // Converts the key_events array to a JSON string.
-    const data = JSON.stringify({ key_events: key_events });
-
-    // Sends the data to the server using the fetch API.
-    fetch('/analyze_keystrokes', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: data
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data); // Logs the success message and data.
-        key_events = []; // Resets the key_events array after successful submission.
-        // Fetches a new phrase from the server.
-        return fetch('/get_new_phrase');
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Updates the displayed phrase with the new phrase received from the server.
-        const phraseToType = document.getElementById('phraseToType');
-        phraseToType.textContent = data.newPhrase;
-    })
-    .catch((error) => {
-        console.error('Error:', error); // Logs any errors that occur during the fetch operation.
-    });
-}
