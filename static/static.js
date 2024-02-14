@@ -1,14 +1,17 @@
+// static.js
+
 // Initializes an array to store the key events data
 let keyEvents = [];
 
-// This array contains a carefully selected list of phrases optimized to include a total of 63 unique two-letter combinations.
+// This array contains a carefully selected list of phrases optimized to include a total of 91 unique two-letter combinations.
 // These phrases were chosen based on their ability to maximize the diversity of letter pairs, providing a wide range of combinations for analysis or application purposes.
 const phrases = [
-  "Lonely Castle",
-  "Eternal Mountain",
-  "Shattered Light",
-  "Frozen Ocean",
-  "Whispering Flame"
+  "Pessimistic Hurricane",
+  "Frozen Mountain",
+  "Clumsy Waterfall",
+  "Graceful Nightmare",
+  "Polished Blizzard",
+  "Glowing Tornado"
 ];
 let currentPhrase = ""; // Variable to store the current phrase
 

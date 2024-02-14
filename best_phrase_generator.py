@@ -2,11 +2,11 @@ import random
 from itertools import product
 
 # Simplified genetic algorithm parameters
-population_size = 100
-number_of_generations = 1000
+population_size = 300
+number_of_generations = 10000
 mutation_rate = 0.1
 PAIRS_PER_SOLUTION = (
-    5  # Set the number of adjective-noun pairs per solution as a constant
+    6  # Set the number of adjective-noun pairs per solution as a constant
 )
 
 
@@ -279,9 +279,14 @@ def genetic_algorithm(adjectives, nouns):
     return best_solution, calculate_fitness(best_solution)
 
 
-# Example execution with a limited set of words
-best_solution, best_score = genetic_algorithm(
-    adjectives[:20], nouns[:20]
-)  # Use subsets for demonstration
+# Execute the genetic algorithm using the full list of adjectives and nouns
+best_solution, best_score = genetic_algorithm(adjectives, nouns)
+
+# Format and print the best solution
+formatted_phrases = [
+    '  "{} {}"'.format(adj.capitalize(), noun.capitalize())
+    for adj, noun in best_solution
+]
+formatted_output = ",\n".join(formatted_phrases)
 print("Best Score:", best_score)
-print("Best Solution:", best_solution)
+print("Best Solution as Phrases:\n[\n{}\n]".format(formatted_output))
