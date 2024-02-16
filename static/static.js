@@ -76,6 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
   selectNewPhrase();
   // Automatically focus on the typing input field when the page loads
   typingDataInput.focus();
+
+  // Disable paste into the input field
+  typingDataInput.addEventListener('paste', (event) => {
+    event.preventDefault();
+    alert('Pasting text is not allowed.');
+  });
+
   // Listen for keydown and keyup events on the input field
   typingDataInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
