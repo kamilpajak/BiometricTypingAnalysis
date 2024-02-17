@@ -142,7 +142,4 @@ cython_debug/
 *.iml
 *.ipr
 
-# Virtual Environment
-venv/
-
 *.csv
