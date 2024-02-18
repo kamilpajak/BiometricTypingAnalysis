@@ -1,10 +1,17 @@
 # keystroke_processor.py
-class KeystrokeProcessor:
-    def __init__(self):
-        self.keystrokes = []
+from models.keystroke import Keystroke
 
-    def process_key_events(self, key_events):
-        self.keystrokes.clear()
+
+class KeystrokeProcessor:
+    @staticmethod
+    def process_key_events(key_events):
+        """
+        Processes a list of key events, converting them into a sorted list of Keystroke instances.
+
+        :param key_events: A list of key event dictionaries, each containing 'key', 'type', and 'time'.
+        :return: A sorted list of Keystroke instances.
+        """
+        keystrokes = []
         press_times = {}
         for raw_keystroke in key_events:
             key = raw_keystroke["key"].lower()
@@ -14,8 +21,8 @@ class KeystrokeProcessor:
             if action == "press" and key not in press_times:
                 press_times[key] = timestamp
             elif action == "release" and key in press_times:
-                self.keystrokes.append((key, press_times[key], timestamp))
+                keystrokes.append(Keystroke(key, press_times[key], timestamp))
                 del press_times[key]
 
-        self.keystrokes.sort(key=lambda x: x[1])
-        return self.keystrokes
+        keystrokes.sort(key=lambda x: x.press_time)
+        return keystrokes
