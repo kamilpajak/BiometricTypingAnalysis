@@ -13,10 +13,10 @@ class KeystrokeProcessor:
         """
         keystrokes = []
         press_times = {}
-        for raw_keystroke in key_events:
-            key = raw_keystroke["key"].lower()
-            action = raw_keystroke["type"]
-            timestamp = raw_keystroke["time"]
+        for key_event in key_events:
+            key = key_event["key"].lower()
+            action = key_event["type"]
+            timestamp = key_event["time"]
 
             if action == "press" and key not in press_times:
                 press_times[key] = timestamp

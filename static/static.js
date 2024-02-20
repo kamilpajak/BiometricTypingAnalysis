@@ -50,7 +50,7 @@ function sendKeystrokesToServer() {
   if (textMatchesPhrase()) {
     const data = JSON.stringify({ keyEvents: keyEvents });
 
-    fetch('/capture/analyze_keystrokes', {
+    fetch('/capture/process_keystrokes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: data
