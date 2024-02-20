@@ -1,37 +1,66 @@
 import pytest
 
-from feature_calculator import FeatureCalculator
+from models import Keystroke, KeystrokeTimingFeatures
 
 
-# Define the test cases for the feature calculations
-@pytest.mark.parametrize("keystrokes, expected_features", [
-    # Test case 1: Simple key presses and releases
-    ([
-         ('a', 0, 1),
-         ('b', 2, 3)
-     ], {
-         'keys': ['a', 'b'],
-         'DD': [2],
-         'UD': [1],
-         'DU': [1, 1]
-     }),
+@pytest.mark.parametrize(
+    "keystrokes_data, expected_features",
+    [
+        # Test case 1: Simple key presses and releases
+        (
+            [
+                Keystroke("a", 0, 1),
+                Keystroke("b", 2, 3),
+            ],
+            {
+                "keystrokes": [
+                    {"key": "a", "press_time": 0, "release_time": 1},
+                    {"key": "b", "press_time": 2, "release_time": 3},
+                ],
+                "press_to_press": [2],
+                "release_to_press": [1],
+                "press_to_release": [1, 1],
+            },
+        ),
+        # Test case 2: Overlapping key presses
+        (
+            [
+                Keystroke("a", 0, 3),
+                Keystroke("b", 1, 4),
+                Keystroke("c", 5, 6),
+            ],
+            {
+                "keystrokes": [
+                    {"key": "a", "press_time": 0, "release_time": 3},
+                    {"key": "b", "press_time": 1, "release_time": 4},
+                    {"key": "c", "press_time": 5, "release_time": 6},
+                ],
+                "press_to_press": [1, 4],
+                "release_to_press": [-2, 1],
+                "press_to_release": [3, 3, 1],
+            },
+        ),
+    ],
+)
+def test_keystroke_timing_features(keystrokes_data, expected_features):
 
-    # Test case 2: Overlapping key presses
-    ([
-         ('a', 0, 3),
-         ('b', 1, 4),
-         ('c', 5, 6)
-     ], {
-         'keys': ['a', 'b', 'c'],
-         'DD': [1, 4],
-         'UD': [-2, 1],
-         'DU': [3, 3, 1]
-     }),
+    keystroke_timing_features = KeystrokeTimingFeatures(
+        keystrokes=keystrokes_data, user_id=1
+    )
 
-    # Add more test cases as needed...
-])
-def test_feature_calculator(keystrokes, expected_features):
-    # Call the calculate_features method from the FeatureCalculator class
-    features = FeatureCalculator.calculate_features(keystrokes)
-    # Assert that the calculated features match the expected features
-    assert features == expected_features
+    assert (
+        keystroke_timing_features.features.get("keystrokes")
+        == expected_features["keystrokes"]
+    )
+    assert (
+        keystroke_timing_features.features.get("press_to_press")
+        == expected_features["press_to_press"]
+    )
+    assert (
+        keystroke_timing_features.features.get("release_to_press")
+        == expected_features["release_to_press"]
+    )
+    assert (
+        keystroke_timing_features.features.get("press_to_release")
+        == expected_features["press_to_release"]
+    )
