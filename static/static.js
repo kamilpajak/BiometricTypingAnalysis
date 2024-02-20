@@ -3,16 +3,31 @@
 // Initializes an array to store the key events data
 let keyEvents = [];
 
-// This array contains a carefully selected list of phrases optimized to include a total of 91 unique two-letter combinations.
 // These phrases were chosen based on their ability to maximize the diversity of letter pairs, providing a wide range of combinations for analysis or application purposes.
-const phrases = [
-  "Pessimistic Hurricane",
-  "Frozen Mountain",
-  "Clumsy Waterfall",
-  "Graceful Nightmare",
-  "Polished Blizzard",
-  "Glowing Tornado"
-];
+const phrases = {
+  // This array contains a carefully selected list of phrases optimized to include a total of 91 unique two-letter combinations.
+  english: [
+    "Pessimistic Hurricane",
+    "Frozen Mountain",
+    "Clumsy Waterfall",
+    "Graceful Nightmare",
+    "Polished Blizzard",
+    "Glowing Tornado"
+  ],
+  // This array contains a carefully selected list of phrases optimized to include a total of 98 unique two-letter combinations.
+  polish: [
+    "Perfekcyjny Mikrofon",
+    "Racjonalny Zasobnik",
+    "Zdeprawowany Laptop",
+    "Energetyczny Samolot",
+    "Gadatliwy Telewizor",
+    "Brzydki Poduszkowiec"
+  ]
+};
+
+// Hardcoded language flag
+const languageFlag = "polish"; // Use "english" or "polish" to set the language of phrases
+
 let currentPhrase = ""; // Variable to store the current phrase
 
 // Retrieves the input element and phrase display by their IDs
@@ -38,8 +53,9 @@ function resetTyping() {
 // Helper function to randomly select a new phrase different from the current one
 function selectNewPhrase() {
   let newPhrase;
+  const currentPhrases = phrases[languageFlag]; // Access phrases based on the current language flag
   do {
-    newPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+    newPhrase = currentPhrases[Math.floor(Math.random() * currentPhrases.length)];
   } while (newPhrase === currentPhrase);
   currentPhrase = newPhrase;
   phraseToTypeElement.textContent = newPhrase;
@@ -72,18 +88,14 @@ function sendKeystrokesToServer() {
 
 // Set up event listeners after the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Initially select a random phrase when the page loads
-  selectNewPhrase();
-  // Automatically focus on the typing input field when the page loads
-  typingDataInput.focus();
+  selectNewPhrase(); // Initially select a random phrase when the page loads
+  typingDataInput.focus(); // Automatically focus on the typing input field when the page loads
 
-  // Disable paste into the input field
   typingDataInput.addEventListener('paste', (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Disable paste into the input field
     alert('Pasting text is not allowed.');
   });
 
-  // Listen for keydown and keyup events on the input field
   typingDataInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
