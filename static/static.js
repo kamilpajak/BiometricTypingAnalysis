@@ -25,35 +25,30 @@ const phrases = {
   ]
 };
 
-// Hardcoded language flag
-const languageFlag = "polish"; // Use "english" or "polish" to set the language of phrases
+const languageFlag = "polish"; // Change to "english" as needed
 
-let currentPhrase = ""; // Variable to store the current phrase
+let currentPhrase = ""; // Stores the current phrase to be typed
 
-// Retrieves the input element and phrase display by their IDs
 const typingDataInput = document.getElementById('typingData');
 const phraseToTypeElement = document.getElementById('phraseToType');
 
-// Helper function to record a key event
 function recordKeyEvent(key, eventType, time) {
   keyEvents.push({ key, type: eventType, time });
 }
 
-// Helper function to check if entered text matches the phrase
 function textMatchesPhrase() {
+  // Checks if the current input text exactly matches the phrase
   return typingDataInput.value.trim() === phraseToTypeElement.textContent.trim();
 }
 
-// Helper function to clear input and key events data
 function resetTyping() {
   typingDataInput.value = '';
   keyEvents = [];
 }
 
-// Helper function to randomly select a new phrase different from the current one
 function selectNewPhrase() {
   let newPhrase;
-  const currentPhrases = phrases[languageFlag]; // Access phrases based on the current language flag
+  const currentPhrases = phrases[languageFlag];
   do {
     newPhrase = currentPhrases[Math.floor(Math.random() * currentPhrases.length)];
   } while (newPhrase === currentPhrase);
@@ -61,10 +56,10 @@ function selectNewPhrase() {
   phraseToTypeElement.textContent = newPhrase;
 }
 
-// Sends the keystrokes to the server if the text matches the phrase
 function sendKeystrokesToServer() {
+  // Sends the keystrokes to the server if the text matches the phrase
   if (textMatchesPhrase()) {
-    const data = JSON.stringify({ keyEvents: keyEvents });
+    const data = JSON.stringify({ keyEvents });
 
     fetch('/capture/process_keystrokes', {
       method: 'POST',
@@ -80,26 +75,40 @@ function sendKeystrokesToServer() {
     .catch((error) => {
       console.error('Error:', error);
     });
-  } else {
-    alert('The text does not match. Please try again.');
-    resetTyping();
   }
 }
 
-// Set up event listeners after the DOM is fully loaded
+function checkTypingAccuracy() {
+  if (!currentPhrase.startsWith(typingDataInput.value.trim())) {
+    alert('The text does not match. Please try again.');
+    resetTyping();
+    selectNewPhrase();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  selectNewPhrase(); // Initially select a random phrase when the page loads
-  typingDataInput.focus(); // Automatically focus on the typing input field when the page loads
+  selectNewPhrase();
+  typingDataInput.focus();
 
   typingDataInput.addEventListener('paste', (event) => {
-    event.preventDefault(); // Disable paste into the input field
+    event.preventDefault();
     alert('Pasting text is not allowed.');
+  });
+
+  typingDataInput.addEventListener('input', (event) => {
+    checkTypingAccuracy(); // Checks the typing accuracy on every input
   });
 
   typingDataInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      sendKeystrokesToServer();
+      // Check if the phrase matches and then send the data
+      if (textMatchesPhrase()) {
+        sendKeystrokesToServer();
+      } else {
+        alert('The text does not match the phrase. Please try again.');
+        resetTyping();
+      }
     } else {
       recordKeyEvent(event.key, 'press', Date.now());
     }
