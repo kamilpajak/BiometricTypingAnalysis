@@ -56,10 +56,32 @@ function selectNewPhrase() {
   phraseToTypeElement.textContent = newPhrase;
 }
 
+function filterIrrelevantShiftEvents(keyEvents) {
+  const relevantEvents = [];
+  let shiftIndex = -1;
+
+  keyEvents.forEach((event, index) => {
+    if (event.key === 'Shift' && event.type === 'press') {
+      shiftIndex = index;
+    } else if (event.key === 'Shift' && event.type === 'release' && shiftIndex !== -1) {
+      if (index === shiftIndex + 1) {
+        shiftIndex = -1;
+      } else {
+        relevantEvents.push(...keyEvents.slice(shiftIndex, index + 1));
+        shiftIndex = -1;
+      }
+    } else if (shiftIndex === -1) {
+      relevantEvents.push(event);
+    }
+  });
+
+  return relevantEvents;
+}
+
 function sendKeystrokesToServer() {
-  // Sends the keystrokes to the server if the text matches the phrase
   if (textMatchesPhrase()) {
-    const data = JSON.stringify({ keyEvents });
+    const filteredEvents = filterIrrelevantShiftEvents(keyEvents);
+    const data = JSON.stringify({ keyEvents: filteredEvents });
 
     fetch('/capture/process_keystrokes', {
       method: 'POST',
@@ -75,6 +97,9 @@ function sendKeystrokesToServer() {
     .catch((error) => {
       console.error('Error:', error);
     });
+  } else {
+    alert('The text does not match. Please try again.');
+    resetTyping();
   }
 }
 
