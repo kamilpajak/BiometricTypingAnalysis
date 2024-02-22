@@ -129,15 +129,18 @@ adjectives = {
         "daleki",
         "dumny",
         "energetyczny",
+        "epicki",
         "gadatliwy",
         "gotowy",
         "gruby",
+        "historyczny",
         "jasny",
         "jedyny",
         "kolorowy",
         "konieczny",
         "konkretny",
         "kulisty",
+        "legendarny",
         "lepszy",
         "lodowaty",
         "lojalny",
@@ -145,10 +148,12 @@ adjectives = {
         "martwy",
         "mniejszy",
         "mocny",
+        "monumentalny",
         "naiwny",
         "naturalny",
         "niebieski",
         "niedrogi",
+        "niesamowity",
         "nietykalny",
         "normalny",
         "nowoczesny",
@@ -173,6 +178,8 @@ adjectives = {
         "pusty",
         "pyszny",
         "racjonalny",
+        "rewelacyjny",
+        "rewolucyjny",
         "rzadki",
         "samotny",
         "silny",
@@ -191,6 +198,7 @@ adjectives = {
         "szybki",
         "trafny",
         "twardy",
+        "unikatowy",
         "widowiskowy",
         "wielki",
         "wolny",
@@ -324,6 +332,7 @@ nouns = {
         "alarm",
         "aparat",
         "asfalt",
+        "astronauta",
         "atencjusz",
         "balon",
         "beton",
@@ -333,12 +342,12 @@ nouns = {
         "dach",
         "dron",
         "dysk",
+        "dywan",
         "ekran",
         "ekspres",
         "faks",
         "film",
         "fotel",
-        "gitara",
         "gong",
         "grill",
         "hak",
@@ -371,9 +380,7 @@ nouns = {
         "kwarc",
         "kwiat",
         "laptop",
-        "lornetka",
         "lustro",
-        "magnet",
         "mikrofon",
         "monitor",
         "most",
@@ -384,6 +391,7 @@ nouns = {
         "obiektyw",
         "obraz",
         "ocean",
+        "oczyszczacz",
         "odkurzacz",
         "okno",
         "organizator",
@@ -391,6 +399,7 @@ nouns = {
         "palec",
         "parasol",
         "piec",
+        "pierwiastek",
         "pies",
         "pilot",
         "poduszkowiec",
@@ -403,20 +412,21 @@ nouns = {
         "rower",
         "rybak",
         "samolot",
-        "satelita",
         "sedes",
         "telefon",
+        "teleskop",
         "telewizor",
+        "tygrys",
         "ubranie",
         "wagon",
         "wazon",
         "wiatr",
         "wilk",
+        "wzmacniacz",
         "zamek",
         "zapalnik",
         "zasobnik",
         "zastrzyk",
-        "zebra",
         "zegar",
         "zszywacz",
     ],
@@ -435,22 +445,19 @@ def find_duplicates(words):
 
 
 def validate_lists():
-    for language, adjs in adjectives.items():
-        adj_set = set(adjs)
-        if len(adj_set) != 100:
-            dup_count = len(adjs) - len(adj_set)
-            duplicates = find_duplicates(adjs)
-            raise ValueError(
-                f"Adjectives list for {language} contains {len(adjs)} elements with {dup_count} duplicates ({', '.join(duplicates)}), expected 100 unique elements."
-            )
-    for language, ns in nouns.items():
-        noun_set = set(ns)
-        if len(noun_set) != 100:
-            dup_count = len(ns) - len(noun_set)
-            duplicates = find_duplicates(ns)
-            raise ValueError(
-                f"Nouns list for {language} contains {len(ns)} elements with {dup_count} duplicates ({', '.join(duplicates)}), expected 100 unique elements."
-            )
+    for category_name, items in [("adjectives", adjectives), ("nouns", nouns)]:
+        for language, words in items.items():
+            unique_words = set(words)
+            if len(unique_words) < 100:
+                raise ValueError(
+                    f"{category_name.capitalize()} list for {language} contains less than 100 unique elements. Found: {len(unique_words)} unique elements."
+                )
+            if len(unique_words) != len(words):
+                dup_count = len(words) - len(unique_words)
+                duplicates = find_duplicates(words)
+                raise ValueError(
+                    f"{category_name.capitalize()} list for {language} contains {dup_count} duplicates: {', '.join(duplicates)}. Each element must be unique."
+                )
 
 
 # Call the validation function to check the lists

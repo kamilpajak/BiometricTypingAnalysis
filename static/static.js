@@ -14,14 +14,14 @@ const phrases = {
     "Polished Blizzard",
     "Glowing Tornado"
   ],
-  // This array contains a carefully selected list of phrases optimized to include a total of 98 unique two-letter combinations.
+  // This array contains a carefully selected list of phrases optimized to include a total of 101 unique two-letter combinations.
   polish: [
-    "Perfekcyjny Mikrofon",
-    "Racjonalny Zasobnik",
-    "Zdeprawowany Laptop",
-    "Energetyczny Samolot",
-    "Gadatliwy Telewizor",
-    "Brzydki Poduszkowiec"
+    "Energetyczny Poduszkowiec",
+    "Perfekcyjny Wzmacniacz",
+    "Monumentalny Karabin",
+    "Brzydki Telewizor",
+    "Zdeprawowany Astronauta",
+    "Gadatliwy Zasobnik"
   ]
 };
 
