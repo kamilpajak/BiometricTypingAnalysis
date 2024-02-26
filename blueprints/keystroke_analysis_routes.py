@@ -1,64 +1,100 @@
 # keystroke_analysis_routes.py
 
-from collections import defaultdict
+import numpy as np
+from flask import Blueprint, session, jsonify, request
+from sqlalchemy import desc
 
-from flask import Blueprint, session, jsonify
-
-from models import KeystrokeTimingFeatures
+from database import db
+from models import KeystrokeTimingFeatures, Template
 
 keystroke_analysis_bp = Blueprint(
     "keystroke_analysis", __name__, template_folder="templates"
 )
 
 
-def group_records_by_key_sequence(records):
-    """
-    Groups records by their sequences of keys. Records with identical sequences of keys
-    are grouped together, regardless of the timing values.
-
-    :param records: A list of KeystrokeTimingFeatures instances.
-    :return: A dictionary where each key is a tuple representing a unique sequence of keys,
-             and the value is a list of record IDs that share this sequence.
-    """
-    sequence_groups = defaultdict(list)
-    for record in records:
-        # Extract the sequence of keys from the record
-        key_sequence = tuple(ks["key"] for ks in record.features["keystrokes"])
-        sequence_groups[key_sequence].append(record.id)
-    return sequence_groups
+def calculate_statistics(values):
+    """Calculate mean and standard deviation."""
+    mean_val = np.mean(values)
+    std_dev_val = np.std(values, ddof=1)  # ddof=1 for standard deviation
+    return mean_val, std_dev_val
 
 
-@keystroke_analysis_bp.route("/grouped_keystrokes", methods=["GET"])
-def get_grouped_keystrokes():
-    """
-    Retrieves keystroke records from the database, groups them by the sequence of keys,
-    and returns the grouped sequences for the logged-in user.
-    """
+@keystroke_analysis_bp.route("/calculate_template", methods=["POST"])
+def calculate_template():
+    """Calculate the template based on a specific key sequence."""
     if "user_id" not in session:
         return jsonify({"error": "User is not logged in"}), 400
 
-    user_id = session["user_id"]
-    try:
-        records = KeystrokeTimingFeatures.query.filter_by(user_id=user_id).all()
-        grouped_by_sequence = group_records_by_key_sequence(records)
+    # Expecting JSON data with 'sequence'
+    data = request.get_json()
+    sequence = data.get("sequence")
 
-        # Prepare the response data
-        grouped_sequences = [
-            {"sequence": list(sequence), "record_ids": ids}
-            for sequence, ids in grouped_by_sequence.items()
-        ]
+    if not sequence:
+        return jsonify({"error": "Key sequence not provided"}), 400
+
+    user_id = session["user_id"]
+
+    try:
+        # Retrieve all records for the given user
+        records = (
+            KeystrokeTimingFeatures.query.filter_by(user_id=user_id)
+            .order_by(desc(KeystrokeTimingFeatures.created_at))
+            .all()
+        )
+
+        # Filter records to match the provided sequence
+        filtered_records = []
+        for record in records:
+            if "keystrokes" in record.features:
+                keys = [ks["key"] for ks in record.features["keystrokes"]]
+                # Check if the beginning of the keys list matches the provided sequence
+                if keys[: len(sequence)] == sequence:
+                    filtered_records.append(record)
+
+        # Now, select the 10 most recent matching records
+        matching_records = filtered_records[:10]
+
+        # Initialize lists to store timing intervals for each feature
+        press_to_press_intervals = []
+        release_to_press_intervals = []
+        press_to_release_intervals = []
+
+        # Extract the timing intervals from the matching records
+        for record in matching_records:
+            press_to_press_intervals.extend(record.features["press_to_press"])
+            release_to_press_intervals.extend(record.features["release_to_press"])
+            press_to_release_intervals.extend(record.features["press_to_release"])
+
+        # Calculate the statistics for each feature
+        mean_press_to_press, std_dev_press_to_press = calculate_statistics(
+            press_to_press_intervals
+        )
+        mean_release_to_press, std_dev_release_to_press = calculate_statistics(
+            release_to_press_intervals
+        )
+        mean_press_to_release, std_dev_press_to_release = calculate_statistics(
+            press_to_release_intervals
+        )
+
+        # Create and save the Template object with calculated statistics
+        new_template = Template(
+            key=sequence[0],  # Assuming the sequence starts with the key of interest
+            mean_press_press=mean_press_to_press,
+            std_dev_press_press=std_dev_press_to_press,
+            mean_release_press=mean_release_to_press,
+            std_dev_release_press=std_dev_release_to_press,
+            mean_press_release=mean_press_to_release,
+            std_dev_press_release=std_dev_press_to_release,
+            user_id=user_id,
+        )
+        db.session.add(new_template)
+        db.session.commit()
 
         return jsonify(
-            {
-                "message": "Successfully retrieved and grouped keystroke sequences",
-                "grouped_sequences": grouped_sequences,
-            }
+            {"message": "Template statistics calculated and saved successfully"}
         )
     except Exception as e:
-        # Assuming your Flask app is configured for logging
-        print(
-            f"Error retrieving grouped keystrokes: {str(e)}"
-        )  # Consider using logging instead of print in production
+        print(f"Error calculating template: {str(e)}")
         return (
             jsonify({"error": "An error occurred while processing your request"}),
             500,
