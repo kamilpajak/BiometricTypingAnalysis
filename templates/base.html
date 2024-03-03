@@ -28,30 +28,35 @@
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            {% if 'user_id' in session %}
-            <!-- Capture/Home button for logged-in users -->
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                {% if 'user_id' in session %}
+                <!-- Capture/Home button for logged-in users -->
                 <li class="nav-item">
                     <a aria-current="page" class="nav-link active" href="{{ url_for('capture.index') }}">Capture</a>
                 </li>
+                <!-- Who's Writing button for logged-in users -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('keystroke_analysis.whos_writing') }}">Who's Writing?</a>
+                </li>
+                {% endif %}
             </ul>
-            <!-- Logout button for logged-in users -->
+            <!-- Right side of the navbar for logout or sign in/up -->
             <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                {% if 'user_id' in session %}
+                <!-- Logout button for logged-in users -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                 </li>
-            </ul>
-            {% else %}
-            <!-- Sign in and Sign up buttons for guests -->
-            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                {% else %}
+                <!-- Sign in and Sign up buttons for guests -->
                 <li class="nav-item">
                     <a class="btn btn-outline-light me-2" href="{{ url_for('auth.login') }}">Sign in</a>
                 </li>
                 <li class="nav-item">
                     <a class="btn btn-light" href="{{ url_for('auth.register') }}">Sign up</a>
                 </li>
+                {% endif %}
             </ul>
-            {% endif %}
         </div>
     </div>
 </nav>

@@ -1,7 +1,7 @@
 # keystroke_analysis_routes.py
 
 import numpy as np
-from flask import Blueprint, session, jsonify, request
+from flask import Blueprint, session, jsonify, request, render_template
 from sqlalchemy import desc
 
 from database import db
@@ -99,3 +99,9 @@ def calculate_template():
             jsonify({"error": "An error occurred while processing your request"}),
             500,
         )
+
+
+@keystroke_analysis_bp.route("/whos_writing")
+def whos_writing():
+    # You might want to include any necessary data or logic here
+    return render_template("whos_writing.html")

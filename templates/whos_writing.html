@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Who's Writing?</h1>
+    <p class="lead text-center">This page is designed to display typing patterns and identify the user based on their
+        typing biometrics.</p>
+
+    <!-- Content for the Who's Writing feature -->
+    <div id="whos-writing-container">
+        <!-- You can put a form here to capture typing or display results -->
+        <!-- For example, a simple display area: -->
+        <div class="typing-display my-4 p-3 border rounded">
+            <p>Type something to see the magic!</p>
+            <!-- Add more interactive elements as needed -->
+        </div>
+
+        <!-- If you have results to display, you can use a section like this: -->
+        <div class="results-display my-4 p-3 border rounded">
+            <h2>Analysis Results:</h2>
+            <!-- Populate with results from the analysis -->
+            <p>User typing pattern matches: <strong>Username123</strong></p>
+            <!-- Add more result details as needed -->
+        </div>
+    </div>
+</div>
+{% endblock %}
